@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  # In the release job, try to use artifacts from the build job as much as possible
+  # to keep the release deterministic. This will ensure the release includes the tested artifacts.
+  release:
+    name: Release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Latest Flag
+        run: |
+          git fetch --tags
+          latest_tag=$(git tag -l | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+            if [ "$latest_tag" == "${GITHUB_REF##*/}" ]; then
+                echo "LATEST=true" >> $GITHUB_ENV
+            else
+                echo "LATEST=false" >> $GITHUB_ENV
+            fi
+
+      - name: Print Latest Flag
+        run: echo "LATEST=${{ env.LATEST }}"
