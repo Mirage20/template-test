@@ -29,4 +29,9 @@ jobs:
             fi
 
       - name: Print Latest Flag
-        run: echo "LATEST=${{ env.LATEST }}"
+        run: |
+          if [ "${{ env.LATEST }}" == "true" ]; then
+            echo "This is the latest release."
+          else
+            echo "This is not the latest release."
+          fi
